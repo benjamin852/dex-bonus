@@ -84,6 +84,7 @@ contract DexBonus is AxelarExecutable {
      */
     function init(uint256 tokens) public payable returns (uint256) {
         require(totalLiquidity == 0, "DEX: init - already has liquidity");
+        //total lp tokens available initially
         totalLiquidity = address(this).balance;
         liquidity[msg.sender] = totalLiquidity;
         require(
@@ -175,10 +176,15 @@ contract DexBonus is AxelarExecutable {
         uint256 tokenDeposit;
 
         tokenDeposit = ((msg.value * tokenReserve) / ethReserve) + 1;
+
+        //LP tokens
         uint256 liquidityMinted = (msg.value * totalLiquidity) / ethReserve;
+
+        //Mark LP tokens for sender
         liquidity[msg.sender] += liquidityMinted;
         totalLiquidity += liquidityMinted;
 
+        //transfer in erc20s
         require(token.transferFrom(msg.sender, address(this), tokenDeposit));
         emit LiquidityProvided(
             msg.sender,
@@ -220,44 +226,66 @@ contract DexBonus is AxelarExecutable {
      * @notice trigger token swap on dest chain
      * @param _destChain name of dest chain
      * @param _destContractAddr address on destination chain
-     * @param _tokenAmount amount of token to swap
+     * @param _symbol token symbol
+     * @param _amount amount of token to swap
      */
     function interchainSwap(
         string memory _destChain,
         string memory _destContractAddr,
-        uint256 _tokenAmount
+        string memory _symbol,
+        uint256 _amount
     ) external payable {
         require(msg.value > 0, "insufficient gas provided");
 
-        bytes memory gmpMsg = abi.encode(_tokenAmount);
+        bytes memory gmpMsg = abi.encode(_amount);
+
+        //get token address from symbol
+        address tokenAddress = gateway.tokenAddresses(_symbol);
+
+        //send funds to this contract
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), _amount);
+
+        //approve gateway to spend funds
+        IERC20(tokenAddress).approve(address(gateway), _amount);
 
         //pay gas from source chain
-        gasService.payNativeGasForContractCall{value: msg.value}(
+        gasService.payNativeGasForContractCallWithToken{value: msg.value}(
             address(this), //sender
             _destChain,
             _destContractAddr,
             gmpMsg,
+            _symbol,
+            _amount,
             msg.sender
         );
 
         //send interchain tx
-        gateway.callContract(_destChain, _destContractAddr, gmpMsg);
+        gateway.callContractWithToken(
+            _destChain,
+            _destContractAddr,
+            gmpMsg,
+            _symbol,
+            _amount
+        );
     }
 
     /**
      * @dev cannot send native eth so only swap from token to eth available
      * @notice execute message on dest chain
-     * @param _payload encoded gmp msg
+     * @param
+     * @param
+     * @param amount amount of tokens being sent
      */
-    function _execute(
+    function _executeWithToken(
         string calldata,
         string calldata,
-        bytes calldata _payload
+        bytes calldata,
+        string calldata,
+        uint256 amount
     ) internal override {
         // decode msg
-        uint256 tokenAmount = abi.decode(_payload, (uint256));
+        // uint256 tokenAmount = abi.decode(_payload, (uint256));
 
-        // if (gmpMsg == 1) ethToToken();
-        tokenToEth(tokenAmount);
+        tokenToEth(amount);
     }
 }
