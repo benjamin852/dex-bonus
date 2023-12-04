@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @author stevepham.eth and m00npapi.eth
  * @notice this is a single token pair reserves DEX, ref: "Scaffold-ETH Challenge 4" as per https://speedrunethereum.com/, README.md and full branch (front-end) made with lots of inspiration from pre-existing example repos in scaffold-eth organization.
  */
-contract DEX is AxelarExecutable {
+contract DexBonus is AxelarExecutable {
     /* ========== GLOBAL VARIABLES ========== */
 
     IAxelarGasService public gasService;
@@ -66,11 +66,11 @@ contract DEX is AxelarExecutable {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
-        address token_addr,
+        address _tokenAddr,
         address _gateway,
         address _gasService
     ) AxelarExecutable(_gateway) {
-        token = IERC20(token_addr); //specifies the token address that will hook into the interface and be used through the variable 'token'
+        token = IERC20(_tokenAddr); //specifies the token address that will hook into the interface and be used through the variable 'token'
         gasService = IAxelarGasService(_gasService);
     }
 
@@ -229,10 +229,7 @@ contract DEX is AxelarExecutable {
     ) external payable {
         require(msg.value > 0, "insufficient gas provided");
 
-        bytes memory gmpMsg = abi.encodeWithSignature(
-            "tokenToEth(uint256)",
-            _tokenAmount
-        );
+        bytes memory gmpMsg = abi.encode(_tokenAmount);
 
         //pay gas from source chain
         gasService.payNativeGasForContractCall{value: msg.value}(
@@ -258,10 +255,7 @@ contract DEX is AxelarExecutable {
         bytes calldata _payload
     ) internal override {
         // decode msg
-        (uint256 functionSig, uint256 tokenAmount) = abi.decode(
-            _payload,
-            (uint256, uint256)
-        );
+        uint256 tokenAmount = abi.decode(_payload, (uint256));
 
         // if (gmpMsg == 1) ethToToken();
         tokenToEth(tokenAmount);
