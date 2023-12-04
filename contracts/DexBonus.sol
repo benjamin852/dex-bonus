@@ -250,7 +250,7 @@ contract DexBonus is AxelarExecutable {
 
         //pay gas from source chain
         gasService.payNativeGasForContractCallWithToken{value: msg.value}(
-            address(this), //sender
+            address(this),
             _destChain,
             _destContractAddr,
             gmpMsg,
@@ -283,9 +283,6 @@ contract DexBonus is AxelarExecutable {
         string calldata,
         uint256 amount
     ) internal override {
-        // decode msg
-        // uint256 tokenAmount = abi.decode(_payload, (uint256));
-
         tokenToEth(amount);
     }
 }
