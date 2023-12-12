@@ -230,14 +230,14 @@ contract DexBonus is AxelarExecutable {
      * @param _amount amount of token to swap
      */
     function interchainSwap(
-        string memory _destChain,
-        string memory _destContractAddr,
-        string memory _symbol,
-        uint256 _amount
+        string memory _destChain, //Polygon
+        string memory _destContractAddr, //address(this)
+        string memory _symbol, //aUSDC
+        uint256 _amount //# of tokens
     ) external payable {
         require(msg.value > 0, "insufficient gas provided");
 
-        bytes memory gmpMsg = abi.encode(_amount);
+        // bytes memory gmpMsg = abi.encode(_amount);
 
         //get token address from symbol
         address tokenAddress = gateway.tokenAddresses(_symbol);
@@ -253,7 +253,7 @@ contract DexBonus is AxelarExecutable {
             address(this),
             _destChain,
             _destContractAddr,
-            gmpMsg,
+            "",
             _symbol,
             _amount,
             msg.sender
@@ -263,7 +263,7 @@ contract DexBonus is AxelarExecutable {
         gateway.callContractWithToken(
             _destChain,
             _destContractAddr,
-            gmpMsg,
+            "",
             _symbol,
             _amount
         );
