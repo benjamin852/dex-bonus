@@ -237,8 +237,6 @@ contract DexBonus is AxelarExecutable {
     ) external payable {
         require(msg.value > 0, "insufficient gas provided");
 
-        // bytes memory gmpMsg = abi.encode(_amount);
-
         //get token address from symbol
         address tokenAddress = gateway.tokenAddresses(_symbol);
 
