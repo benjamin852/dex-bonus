@@ -19,7 +19,7 @@ contract DexBonus is AxelarExecutable {
 
     uint256 public totalLiquidity; //total amount of liquidity provider tokens (LPTs) minted (NOTE: that LPT "price" is tied to the ratio, and thus price of the assets within this AMM)
     mapping(address => uint256) public liquidity; //liquidity of each depositor
-    IERC20 token; //instantiates the imported contract
+    IERC20 public token; //instantiates the imported contract
 
     /* ========== EVENTS ========== */
 

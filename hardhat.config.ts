@@ -2,6 +2,10 @@ import dotenv from 'dotenv'
 import { HardhatUserConfig } from 'hardhat/config'
 import chains from './chains.json'
 
+
+
+
+
 dotenv.config()
 
 const config: HardhatUserConfig = {
