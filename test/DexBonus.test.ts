@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { utils, BigNumber, Contract, Wallet } from 'ethers';
+import { utils, BigNumber, Contract, Wallet, ContractReceipt } from 'ethers';
 import {
   deployContract,
   destroyExported,
@@ -109,6 +109,8 @@ describe('Axelar Bonus Challenge', () => {
     );
 
     await aUSDCPolygon.connect(polygonUserWallet).approve(dexBonusPolygon.address, 1e18.toString())
+
+
   });
 
   describe('setup', () => {
@@ -139,8 +141,24 @@ describe('Axelar Bonus Challenge', () => {
     })
 
     it('should emit ContractCallWithToken when swapping', async () => {
+      console.log(dexBonusPolygon.runner, 'runner')
+      console.log(dexBonusPolygon, 'contract')
       const payloadHash = utils.keccak256(utils.toUtf8Bytes(''))
-      expect(await dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() })).to.emit(dexBonusPolygon, 'ContractCallWithToken')
+      await expect(dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() })).to.emit(dexBonusPolygon, 'ContractCallWithToken')
+
+
+      // const swapTx = await dexBonusPolygon
+      //   .connect(polygonUserWallet)
+      //   .interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() });
+
+      // // Get the receipt
+      // const swapReceipt: ContractReceipt = await swapTx.wait();
+
+      // // Check if events property exists and then find the 'ContractCallWithToken' event
+      // const contractCallEvent = (swapReceipt.events || []) as Event[];
+
+      // expect(contractCallEvent).to.not.be.undefined;
+
       //.withArgs(polygonUserWallet.address, 'Fantom', dexBonusFantom, payloadHash, '', 'aUSDC', 1e6)
 
     })
