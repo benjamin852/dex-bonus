@@ -237,16 +237,16 @@ contract DexBonus is AxelarExecutable {
     ) external payable {
         require(msg.value > 0, "insufficient gas provided");
 
-        //get token address from symbol
+        // //get token address from symbol
         address tokenAddress = gateway.tokenAddresses(_symbol);
 
-        //send funds to this contract
+        // //send funds to this contract
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), _amount);
 
-        //approve gateway to spend funds
+        // //approve gateway to spend funds
         IERC20(tokenAddress).approve(address(gateway), _amount);
 
-        //pay gas from source chain
+        // //pay gas from source chain
         gasService.payNativeGasForContractCallWithToken{value: msg.value}(
             address(this),
             _destChain,
@@ -257,7 +257,7 @@ contract DexBonus is AxelarExecutable {
             msg.sender
         );
 
-        //send interchain tx
+        // //send interchain tx
         gateway.callContractWithToken(
             _destChain,
             _destContractAddr,
