@@ -1,7 +1,7 @@
 import dotenv from 'dotenv'
 import { HardhatUserConfig } from 'hardhat/config'
 import chains from './chains.json'
-
+import '@nomicfoundation/hardhat-toolbox'
 
 
 

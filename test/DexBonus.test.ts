@@ -123,7 +123,7 @@ describe('Axelar Bonus Challenge', () => {
   });
   describe('swap', () => {
     it('reverts if no gas sent', async () => {
-      // expect( dexBonusPolygon.interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: '0' })).to.be.rever
+      expect(dexBonusPolygon.interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: '0' })).to.be.reverted
     })
     it('sends aUSDC from src', async () => {
       //check funds deducted
