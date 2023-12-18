@@ -1,5 +1,6 @@
 import 'dotenv/config';
-import { utils, BigNumber, Contract, Wallet, ContractReceipt } from 'ethers';
+import { ethers } from 'hardhat'
+// import { utils, BigNumber, Contract, Wallet, ContractReceipt } from 'ethers';
 import {
   deployContract,
   destroyExported,
@@ -16,10 +17,10 @@ describe('Axelar Bonus Challenge', () => {
   let fantom: any;
   let aUSDCPolygon: any;
   let aUSDCFantom: any
-  let dexBonusPolygon: Contract;
-  let dexBonusFantom: Contract;
+  let dexBonusPolygon: ethers.Contract;
+  let dexBonusFantom: ethers.Contract;
 
-  let polygonUserWallet: Wallet;
+  let polygonUserWallet: ethers.Wallet;
 
   before(async () => {
     // Initialize an Polygon network
@@ -52,11 +53,11 @@ describe('Axelar Bonus Challenge', () => {
     const createThreeDeployerPolygon = await polygon.deployCreate3Deployer();
     const createThreeDeployerFantom = await fantom.deployCreate3Deployer();
 
-    const creationCodePolygon = utils.solidityPack(
+    const creationCodePolygon = ethers.utils.solidityPack(
       ['bytes', 'bytes'],
       [
         DexBonus.bytecode,
-        utils.defaultAbiCoder.encode(
+        ethers.utils.defaultAbiCoder.encode(
           ['address', 'address', 'address'],
           [
             aUSDCPolygon.address,
@@ -66,24 +67,25 @@ describe('Axelar Bonus Challenge', () => {
         ),
       ]
     );
-    const salt = utils.hexZeroPad(BigNumber.from(101), 32);
+    const salt = ethers.utils.hexZeroPad(ethers.utils.formatBytes32String('101'), 32);
 
     const polygonDeployDexBonus = await createThreeDeployerPolygon
       .connect(polygonUserWallet)
       .deploy(creationCodePolygon, salt);
     const polygonTxReceipt = await polygonDeployDexBonus.wait();
     const polygonDeployedAddr = polygonTxReceipt.events[0].args[2];
-    dexBonusPolygon = new Contract(
+    dexBonusPolygon = new ethers.Contract(
       polygonDeployedAddr,
       DexBonus.abi,
       polygonUserWallet,
     );
 
-    const creationCodeFantom = utils.solidityPack(
+
+    const creationCodeFantom = ethers.utils.solidityPack(
       ['bytes', 'bytes'],
       [
         DexBonus.bytecode,
-        utils.defaultAbiCoder.encode(
+        ethers.utils.defaultAbiCoder.encode(
           ['address', 'address', 'address'],
           [
             aUSDCFantom.address,
@@ -99,7 +101,7 @@ describe('Axelar Bonus Challenge', () => {
     const fantomTxReceipt = await fantomDeployDexBonus.wait();
 
     const fantomDeployedAddr = fantomTxReceipt.events[0].args[2];
-    dexBonusFantom = new Contract(
+    dexBonusFantom = new ethers.Contract(
       fantomDeployedAddr,
       DexBonus.abi,
       fantomUserWallet
@@ -137,8 +139,8 @@ describe('Axelar Bonus Challenge', () => {
     })
 
     it('should emit ContractCallWithToken when swapping', async () => {
+      const payloadHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(''))
       console.log(dexBonusPolygon.runner, 'runner')
-      const payloadHash = utils.keccak256(utils.toUtf8Bytes(''))
       await expect(dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address,
         'aUSDC', 1e6, { value: 1e18.toString() })).to.emit(dexBonusPolygon.connect(polygonUserWallet), 'ContractCallWithToken')
 
