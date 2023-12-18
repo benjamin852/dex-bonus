@@ -40,7 +40,6 @@ describe('Axelar Bonus Challenge', () => {
 
     // Extract user wallets for both networks
     [polygonUserWallet] = polygon.userWallets;
-    console.log(polygonUserWallet, 'user wallet')
     const [fantomUserWallet] = fantom.userWallets;
 
     // Mint tokens on src chain (Polygon)
@@ -49,8 +48,6 @@ describe('Axelar Bonus Challenge', () => {
     // Get token contracts for both chains
     aUSDCPolygon = await polygon.getTokenContract('aUSDC');
     aUSDCFantom = await fantom.getTokenContract('aUSDC');
-
-    // ... (commented out code)
 
     const createThreeDeployerPolygon = await polygon.deployCreate3Deployer();
     const createThreeDeployerFantom = await fantom.deployCreate3Deployer();
@@ -137,29 +134,31 @@ describe('Axelar Bonus Challenge', () => {
       await dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() })
       const myBalanceAfter = await aUSDCPolygon.balanceOf(polygonUserWallet.address)
       expect(myBalanceAfter).to.equal(myBalanceBefore - 1e6)
-
     })
 
     it('should emit ContractCallWithToken when swapping', async () => {
       console.log(dexBonusPolygon.runner, 'runner')
-      console.log(dexBonusPolygon, 'contract')
       const payloadHash = utils.keccak256(utils.toUtf8Bytes(''))
-      await expect(dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() })).to.emit(dexBonusPolygon, 'ContractCallWithToken')
+      await expect(dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address,
+        'aUSDC', 1e6, { value: 1e18.toString() })).to.emit(dexBonusPolygon.connect(polygonUserWallet), 'ContractCallWithToken')
 
 
-      // const swapTx = await dexBonusPolygon
-      //   .connect(polygonUserWallet)
-      //   .interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() });
 
-      // // Get the receipt
-      // const swapReceipt: ContractReceipt = await swapTx.wait();
+      /*
+      const swapTx = await dexBonusPolygon
+        .connect(polygonUserWallet)
+        .interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: 1e18.toString() });
 
-      // // Check if events property exists and then find the 'ContractCallWithToken' event
-      // const contractCallEvent = (swapReceipt.events || []) as Event[];
+      // Get the receipt
+      const swapReceipt: ContractReceipt = await swapTx.wait();
 
-      // expect(contractCallEvent).to.not.be.undefined;
+      // Check if events property exists and then find the 'ContractCallWithToken' event
+      const contractCallEvent = (swapReceipt.events || []) as Event[];
 
-      //.withArgs(polygonUserWallet.address, 'Fantom', dexBonusFantom, payloadHash, '', 'aUSDC', 1e6)
+      expect(contractCallEvent).to.not.be.undefined;
+
+      .withArgs(polygonUserWallet.address, 'Fantom', dexBonusFantom, payloadHash, '', 'aUSDC', 1e6)
+      */
 
     })
     it('should pay gas on src', async () => {
