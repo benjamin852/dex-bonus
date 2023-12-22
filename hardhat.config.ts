@@ -19,7 +19,10 @@ const config: HardhatUserConfig = {
     fantom: {
       url: chains[1].rpc,
       accounts: [`0x${process.env.PRIVATE_KEY}`],
+      gas: 6000000, // Use around 4836635 in total.
       chainId: 4002,
+      gasPrice: 25000000000, // Check standard gas price at https://gasstation-mumbai.matic.today/
+      blockGasLimit: 210000
     },
   },
 }

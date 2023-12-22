@@ -7,7 +7,7 @@ import { getWallet } from '../utils/getWallet'
 
 async function main() {
 
-    const connectedWallet = getWallet(chains[1].rpc, ethers)
+    const connectedWallet = getWallet(chains[1].rpc)
     const dexBonus = await ethers.deployContract('DexBonus', [
         chains[1].aUSDC,
         chains[1].gateway,
@@ -20,11 +20,9 @@ async function main() {
         connectedWallet
     )
 
-    await dexBonus.waitForDeployment()
+    await mockERC20.approve(dexBonus.address, 1e18.toString())
 
-    await mockERC20.approve(dexBonus.target, '1234567895')
-
-    console.log(`fantom contract address: ${dexBonus.target}`)
+    console.log(`fantom contract address: ${dexBonus.address}`)
 }
 
 
@@ -33,3 +31,4 @@ main().catch((error) => {
     console.error(error)
     process.exitCode = 1
 })
+
