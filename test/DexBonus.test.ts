@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { utils, Contract, Wallet } from 'ethers'
-import { createNetwork, relay, listen } from '@axelar-network/axelar-local-dev'
+import { createNetwork, relay, } from '@axelar-network/axelar-local-dev'
 import DexBonus from '../artifacts/contracts/DexBonus.sol/DexBonus.json'
 import { expect } from 'chai'
 
@@ -95,15 +95,16 @@ describe('Axelar Bonus Challenge', () => {
     await aUSDCFantom.connect(fantomUserWallet).approve(dexBonusFantom.address, (100e18).toString())
 
     //fund dex
-    dexBonusFantom.connect(fantomUserWallet).init(1e6, {
+    await dexBonusFantom.connect(fantomUserWallet).init(1e6, {
       value: (1e18).toString(),
     })
+
   })
-  afterEach(async () => {
-    await relay()
-  })
+
   describe('setup', () => {
     it('should set correct gateway addresses on both chains', async () => {
+
+
       expect(await dexBonusPolygon.gasService()).to.equal(polygon.gasService.address)
       expect(await dexBonusFantom.gasService()).to.equal(fantom.gasService.address)
     })
@@ -118,9 +119,15 @@ describe('Axelar Bonus Challenge', () => {
     })
   })
   describe('swap', () => {
+    afterEach(async () => {
+      await relay()
+    })
+
+    //TODO fix this one (not essential if we want to remove)
     // it('reverts if no gas sent', async () => {
     //   expect(await dexBonusPolygon.connect(polygonUserWallet).interchainSwap('Fantom', dexBonusFantom.address, 'aUSDC', 1e6, { value: '1' })).to.be.revertedWith('insufficient gas provided')
     // })
+
     it('should deduct funds when swapping', async () => {
       const myBalanceBefore = await aUSDCPolygon.balanceOf(polygonUserWallet.address)
       await dexBonusPolygon
@@ -189,10 +196,10 @@ describe('Axelar Bonus Challenge', () => {
           polygonUserWallet.address,
         )
     })
+
     it('swaps sent aUSDC for eth at dest chain', async () => {
       const dexTokenBalanceBefore = await aUSDCFantom.balanceOf(dexBonusFantom.address)
       const recipientUserEthBalanceBefore = await fantom.provider.getBalance(fantomUserWallet.address)
-
 
       await dexBonusPolygon
         .connect(polygonUserWallet)
@@ -217,11 +224,14 @@ describe('Axelar Bonus Challenge', () => {
     })
 
     it('should emit TokenToEthSwap after swap', async () => {
-      const tokenReserve = aUSDCFantom.balanceOf(dexBonusFantom.address)
-      const calcPrice = await dexBonusFantom.price(1e13, tokenReserve, dexBonusFantom.address)
 
+      const TokenToEthSwap = dexBonusFantom.filters.TokenToEthSwap()
 
-      const tx = await dexBonusPolygon
+      const blockNumberBefore = fantom.lastRelayedBlock
+      const blockInfoBefore = await fantom.provider.getLogs(blockNumberBefore)
+      const eventsBefore = await dexBonusFantom.queryFilter(TokenToEthSwap, blockInfoBefore.hash);
+
+      await dexBonusPolygon
         .connect(polygonUserWallet)
         .interchainSwap(
           'Fantom',
@@ -236,13 +246,24 @@ describe('Axelar Bonus Challenge', () => {
 
       await relay()
 
-      const listenRes = await listen(fantom.chainId)
-      // console.log(listenRes, 'responmsme')
+      const blockNumberAfter = fantom.lastRelayedBlock
+      const blockInfoAfter = await fantom.provider.getLogs(blockNumberAfter)
+      const eventsAfter = await dexBonusFantom.queryFilter(TokenToEthSwap, blockInfoAfter.hash);
 
-      const receipt = await tx.wait()
-      const event = receipt.events
+
+      //expect additional event to be emitted (on same block) after tx executes
+      expect(eventsBefore.length + 1).to.equal(eventsAfter.length)
+
+      //all events should simply be TokenToEthSwap being emitted
+      for (const key in eventsAfter) {
+        const element = eventsAfter[key];
+        expect(element.event).to.equal('TokenToEthSwap')
+      }
 
     })
+
   })
+
+
 })
 
