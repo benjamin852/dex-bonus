@@ -1,9 +1,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 // SPDX-License-Identifier: MIT
 
-import {AxelarExecutable} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol";
-import {IAxelarGateway} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol";
-import {IAxelarGasService} from "@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -12,10 +9,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @author stevepham.eth and m00npapi.eth
  * @notice this is a single token pair reserves DEX, ref: "Scaffold-ETH Challenge 4" as per https://speedrunethereum.com/, README.md and full branch (front-end) made with lots of inspiration from pre-existing example repos in scaffold-eth organization.
  */
-contract DexBonus is AxelarExecutable {
+contract DexBonus  {
     /* ========== GLOBAL VARIABLES ========== */
-
-    IAxelarGasService public gasService;
 
     uint256 public totalLiquidity; //total amount of liquidity provider tokens (LPTs) minted (NOTE: that LPT "price" is tied to the ratio, and thus price of the assets within this AMM)
     mapping(address => uint256) public liquidity; //liquidity of each depositor
@@ -69,22 +64,20 @@ contract DexBonus is AxelarExecutable {
         address _tokenAddr,
         address _gateway,
         address _gasService
-    ) AxelarExecutable(_gateway) {
+    )  {
         token = IERC20(_tokenAddr); //specifies the token address that will hook into the interface and be used through the variable 'token'
-        gasService = IAxelarGasService(_gasService);
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     /**
-     * @notice init tokens  transferred to  DEX. Loads contract up with both ETH and ERC20.
+     * @notice initializes amount of tokens that will be transferred to the DEX itself from the erc20 contract mintee (and only them based on how Balloons.sol is written). Loads contract up with both ETH and Balloons.
      * @param tokens amount to be transferred to DEX
-     * @return totalLiquidity number of LP tokens minted when deposits made to DEX
-     * NOTE:  ratio is 1:1, this is fine to initialize the totalLiquidity (wrt to balloons) as equal to eth balance of contract.
+     * @return totalLiquidity is the number of LPTs minting as a result of deposits made to DEX contract
+     * NOTE: since ratio is 1:1, this is fine to initialize the totalLiquidity (wrt to balloons) as equal to eth balance of contract.
      */
     function init(uint256 tokens) public payable returns (uint256) {
         require(totalLiquidity == 0, "DEX: init - already has liquidity");
-        //total lp tokens available initially
         totalLiquidity = address(this).balance;
         liquidity[msg.sender] = totalLiquidity;
         require(
@@ -176,15 +169,10 @@ contract DexBonus is AxelarExecutable {
         uint256 tokenDeposit;
 
         tokenDeposit = ((msg.value * tokenReserve) / ethReserve) + 1;
-
-        //LP tokens
         uint256 liquidityMinted = (msg.value * totalLiquidity) / ethReserve;
-
-        //Mark LP tokens for sender
         liquidity[msg.sender] += liquidityMinted;
         totalLiquidity += liquidityMinted;
 
-        //transfer in erc20s
         require(token.transferFrom(msg.sender, address(this), tokenDeposit));
         emit LiquidityProvided(
             msg.sender,
@@ -230,57 +218,27 @@ contract DexBonus is AxelarExecutable {
      * @param _amount amount of token to swap
      */
     function interchainSwap(
-        string memory _destChain, //Polygon
-        string memory _destContractAddr, //address(this)
-        string memory _symbol, //aUSDC
-        uint256 _amount //# of tokens
+        string memory _destChain,
+        string memory _destContractAddr,
+        string memory _symbol,
+        uint256 _amount
     ) external payable {
-        require(msg.value > 0, "insufficient gas provided");
-
-        // //get token address from symbol
-        address tokenAddress = gateway.tokenAddresses(_symbol);
-
-        // //send funds to this contract
-        IERC20(tokenAddress).transferFrom(msg.sender, address(this), _amount);
-
-        // //approve gateway to spend funds
-        IERC20(tokenAddress).approve(address(gateway), _amount);
-
-        // //pay gas from source chain
-        gasService.payNativeGasForContractCallWithToken{value: msg.value}(
-            address(this),
-            _destChain,
-            _destContractAddr,
-            "",
-            _symbol,
-            _amount,
-            msg.sender
-        );
-
-        // //send interchain tx
-        gateway.callContractWithToken(
-            _destChain,
-            _destContractAddr,
-            "",
-            _symbol,
-            _amount
-        );
+      // TODO Implement
     }
 
     /**
-     * @dev cannot send native eth so only swap from token to eth available
      * @notice execute message on dest chain
-     * @param
+     * @param payload in coming gmp msg
      * @param
      * @param amount amount of tokens being sent
      */
     function _executeWithToken(
         string calldata,
         string calldata,
-        bytes calldata,
+        bytes calldata payload,
         string calldata,
         uint256 amount
-    ) internal override {
-        tokenToEth(amount);
+    ) internal /*override*/ {
+      // TODO Implement
     }
 }
