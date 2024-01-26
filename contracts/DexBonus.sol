@@ -125,7 +125,7 @@ contract DexBonus is AxelarExecutable {
    * @notice sends $BAL tokens to DEX in exchange for Ether
    */
   function tokenToEth(
-    address receipient,
+    address recipient,
     bool isInterchainTx,
     uint256 tokenInput
   ) public returns (uint256 ethOutput) {
@@ -134,7 +134,7 @@ contract DexBonus is AxelarExecutable {
     ethOutput = price(tokenInput, token_reserve, address(this).balance);
 
     if (isInterchainTx) {
-      (bool sent, ) = payable(receipient).call{value: ethOutput}('');
+      (bool sent, ) = payable(recipient).call{value: ethOutput}('');
       require(sent, 'tokenToEth: revert in transferring eth to you!');
     } else {
       require(
