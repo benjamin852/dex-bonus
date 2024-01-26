@@ -6,7 +6,7 @@ import { getWallet } from '../utils/getWallet'
 
 async function main() {
 
-  const connectedWallet = getWallet(chains[0].rpc, ethers)
+  const connectedWallet = getWallet(chains[0].rpc)
   const dexBonus = await ethers.deployContract('DexBonus', [
     chains[0].aUSDC,
     chains[0].gateway,
@@ -19,7 +19,7 @@ async function main() {
     connectedWallet
   )
 
-  await dexBonus.waitForDeployment()
+  await mockERC20.approve(dexBonus.address, 1e18.toString())
 
   await mockERC20.approve(dexBonus.target, 1e18.toString())
 

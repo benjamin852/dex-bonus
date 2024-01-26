@@ -122,6 +122,12 @@ describe('Axelar Bonus Challenge', () => {
     afterEach(async () => {
       await relay()
     })
+    it('should set correct aUSDC addresses on both chains', async () => {
+      expect(await dexBonusPolygon.token()).to.equal(aUSDCPolygon.address)
+      expect(await dexBonusFantom.token()).to.equal(aUSDCFantom.address)
+    })
+  })
+  describe('swap', () => {
     it('should deduct funds when swapping', async () => {
       const myBalanceBefore = await aUSDCPolygon.balanceOf(polygonUserWallet.address)
       await dexBonusPolygon
@@ -194,6 +200,12 @@ describe('Axelar Bonus Challenge', () => {
     it('swaps sent aUSDC for eth at dest chain', async () => {
       const dexTokenBalanceBefore = await aUSDCFantom.balanceOf(dexBonusFantom.address)
       const recipientUserEthBalanceBefore = await fantom.provider.getBalance(fantomUserWallet.address)
+
+      await dexBonusPolygon
+        .connect(polygonUserWallet)
+        .interchainSwap('Fantom', dexBonusFantom.address, fantomUserWallet.address, 'aUSDC', 13e6, {
+          value: (1e18).toString(),
+        })
 
       await dexBonusPolygon
         .connect(polygonUserWallet)

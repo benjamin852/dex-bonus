@@ -1,11 +1,12 @@
-export const getWallet = (rpc: string, ethers: any) => {
-    const phrase = process.env.MNEMONIC
+import { ethers } from 'hardhat'
 
-    if (!phrase) throw new Error('invalid mnemonic. Make sure the mnemonic environment variable is set.')
+export const getWallet = (rpc: string) => {
+    const key = process.env.PRIVATE_KEY
 
-    const newMnemonic = ethers.Mnemonic.fromPhrase(phrase)
-    const wallet = ethers.HDNodeWallet.fromMnemonic(newMnemonic)
+    if (!key) { throw new Error('invalid key') }
+
     const provider = ethers.getDefaultProvider(rpc)
+    const wallet = new ethers.Wallet(key, provider);
     const connectedWallet = wallet.connect(provider)
 
     return connectedWallet
