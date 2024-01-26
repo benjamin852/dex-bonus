@@ -4,7 +4,6 @@ import MockERC20 from '../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.s
 
 import { getWallet } from '../utils/getWallet'
 
-
 async function main() {
 
   const connectedWallet = getWallet(chains[0].rpc, ethers)
@@ -22,7 +21,7 @@ async function main() {
 
   await dexBonus.waitForDeployment()
 
-  await mockERC20.approve(dexBonus.target, '1234567895')
+  await mockERC20.approve(dexBonus.target, 1e18.toString())
 
   console.log(`mumbai contract address: ${dexBonus.target}`)
 }
