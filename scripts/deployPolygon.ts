@@ -23,7 +23,7 @@ async function main() {
 
   await mockERC20.approve(dexBonus.target, 1e18.toString())
 
-  console.log(`mumbai contract address: ${dexBonus.target}`)
+  console.log(`polygon contract address: ${dexBonus.target}`)
 }
 
 

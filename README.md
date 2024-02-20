@@ -1,13 +1,18 @@
-# Sample Hardhat Project
+# Dex Bonus Challenge
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This is the starter code for a bonus challenge for the [SpeedRun Eth Dex Challege](https://speedrunethereum.com/). The objective is to send a single transaction Chain A to Chain B via Axelar. This transaction sends a token from Chain A to Chain B and then swaps it on Chain B to Eth.
 
-Try running some of the following tasks:
+## Setup
+1. Clone repo
+2. Install dependencies `npm i`
+3. Setup .env file PRIVATE_KEY='<YOUR_PRIVATE_KEY>'
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
+
+## Tests
+To run the unit tests run `hh test test/DexBonus.test.ts`
+
+## Deploy
+To deploy on Fantom run `hh run scripts/deployFantom.ts --network fantom`
+To deploy on Polygon run `hh run scripts/deployPolygon.ts --network polygon` 
+
+
