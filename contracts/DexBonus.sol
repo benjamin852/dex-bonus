@@ -13,7 +13,7 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
  * @notice this is a single token pair reserves DEX, ref: "Scaffold-ETH Challenge 4" as per https://speedrunethereum.com/, README.md and full branch (front-end) made with lots of inspiration from pre-existing example repos in scaffold-eth organization.
  */
 
-// Live Tx: https://testnet.axelarscan.io/gmp/0x5361ffd417ad239fc6dea2f55b24098d4ebf84c267ead64cd13c5396a35f87cd:6
+// Demo Interchain Tx: https://testnet.axelarscan.io/gmp/0x5361ffd417ad239fc6dea2f55b24098d4ebf84c267ead64cd13c5396a35f87cd:6
 contract DexBonus is AxelarExecutable {
   /* ========== GLOBAL VARIABLES ========== */
 
