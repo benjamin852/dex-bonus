@@ -2,9 +2,9 @@
 
 ## 🚩 **Challenge: Dex Challenge Bonus**
 
-This is the starter code for a bonus challenge for the [SpeedRun Eth Dex Challege](https://speedrunethereum.com/). The objective is to send a single transaction Chain A to Chain B via Axelar. This transaction sends a token from Chain A to Chain B and then swaps it on Chain B to Eth. 
+This is the starter code for a bonus challenge for the [SpeedRun Eth Dex Challege](https://speedrunethereum.com/challenge/minimum-viable-exchange). The objective is to send a single transaction Chain A to Chain B via Axelar. This transaction sends a token from Chain A to Chain B and then swaps it on Chain B to Eth. 
 
-Note: Instead of using the balloons token as specified in the [original](https://speedrunethereum.com/challenge/minimum-viable-exchange) challenge, we will use the [aUSDC](https://axelar.network/blog/what-is-axlusdc-and-how-do-you-get-it) for easier integration with Axelar.
+Note: Instead of using the balloons token as specified in the original challenge, we will use the [aUSDC](https://axelar.network/blog/what-is-axlusdc-and-how-do-you-get-it) for easier integration with Axelar.
 
 `aUSDC` can be obtained at the [Axelar Faucet](https://discord.com/channels/770814806105128977/1002423218772136056)
 
